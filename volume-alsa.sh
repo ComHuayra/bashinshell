@@ -1,0 +1,1 @@
+/home/dani/.bin/volume-alsa.sh
