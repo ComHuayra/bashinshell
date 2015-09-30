@@ -1,1 +1,0 @@
-/home/dani/.bin/logout.tcl
