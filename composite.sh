@@ -18,7 +18,7 @@ function _compton()
   	    killall compton
     else
         # Ver ~/.compton.conf
-        compton -cC
+        compton -cC &
     fi
 }
 
