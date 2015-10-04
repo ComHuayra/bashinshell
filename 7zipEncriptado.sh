@@ -106,7 +106,7 @@ function esPosibleDescomprimir ()
 
         if [[ -e $NAME ]]; then
 
-            zenity --question --text="Ya existe el directorio $NAME\n¿Desea sobrescribirlo?"
+            zenity --question --text="Ya existe el directorio $NAME\n¿Desea sobreescribirlo?"
             return $?
 
         fi
@@ -116,7 +116,7 @@ function esPosibleDescomprimir ()
 
         if [[ -e $NAME ]]; then
 
-            zenity --question --text="Ya existe el archivo $NAME\n¿Desea sobrescribirlo?"
+            zenity --question --text="Ya existe el archivo $NAME\n¿Desea sobreescribirlo?"
             return $?
         fi
 
