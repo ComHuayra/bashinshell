@@ -6,19 +6,22 @@
 #   dichos archivos mediante una clave ingresada por el usuario. El resultado es
 #   un archivo con nombre de la carpeta o archivo más la extensión de 
 #   formato .7z
+# - También permite desencriptar un archivo .7z
 #
 # @ Resumen:
-# - Si el archivo es nuevo se ingresa la clave sólo para encriptar.
-# - Si el archivo ya existe, se actualizará dicho archivo,la clave debe ser la
+# - Si se crea un nuevo archivo, se ingresa la clave para encriptar.
+# - Si el archivo ya existe, se actualizará dicho archivo; la clave debe ser la
 #   del archivo ya encriptado.
 
-# @ Dependecias:
+# @ Dependencias:
 # - p7zip
 # - Zenity
 
 # @ Importante:
-# - No una aplicación para terminal, debe utilizarse desde un
+# - No es una aplicación para terminal, debe utilizarse desde un
 #   explorador de archivos (Thunar, PCManFM, etc)
+# - Cuando se elije sobrescribir un archivo comprimido ya existente, éste se elimina
+#   con el comando 'rm'.
 
 # @ Platillas:
 
@@ -56,10 +59,133 @@
 #---------------------------------------
 ################################################################################
 
+function ObtenerClave ()
+{
+    pass=`zenity --entry \
+        --text="$TEXT"    \
+        --title="$TITLE" \
+        --hide-text`
+
+    if [[ -z $pass ]]; then
+        exit
+    fi
+}
+
+
+function Desencriptar ()
+{
+    local dir="${FILE%/*}/"
+
+    cd "$dir"
+
+    if [[ $? -ne 0 ]]; then
+        zenity --error --text="No se pudo acceder al directorio $dir"
+        exit
+    fi
+
+    7zip 'x'
+}
+
+function 7zipInformacion ()
+{
+    case $1 in
+        'a') TEXT="Ingrese la clave para encriptar:";;
+        'u') TEXT="Ingrese la clave para\ndesencriptar y actualizar:";;
+        'x' | 'e') TEXT="Ingrese la clave para desencriptar:";;
+    esac
+}
+
+
+function esPosibleDescomprimir ()
+{
+    local ES_DIR=`7za l -p$pass $FILE | awk '{print $3,$6}' |  grep ^D[+.]  | awk '{print $1}'`
+
+    if ! [[ -z $ES_DIR ]]; then
+
+        local NAME=`7za l -p$pass $FILE | awk '{print $3,$6}' |  grep ^D[+.]  | awk '{print $2}'`
+
+        if [[ -e $NAME ]]; then
+
+            zenity --question --text="Ya existe el directorio $NAME\n¿Desea sobrescribirlo?"
+            return $?
+
+        fi
+    else
+
+        local NAME=`7za l -p$pass $FILE | awk '{print $3,$6}' |  grep "[+.]A"  | awk '{print $2}'`
+
+        if [[ -e $NAME ]]; then
+
+            zenity --question --text="Ya existe el archivo $NAME\n¿Desea sobrescribirlo?"
+            return $?
+        fi
+
+    fi
+
+    return 0
+}
+
+
+function 7zip ()
+{
+    local func="$1"
+
+    7zipInformacion $func
+
+    ObtenerClave
+
+    (
+        if [ $func == 'u' ] || [ $func == 'a' ];  then
+
+            LOG=`7za $func -y -mhe=on -p$pass "$NAME_ZIP" "$FILE"` || \
+            zenity --info --title="$TITLE" --text="$LOG"
+
+        else if [ $func == 'x' ] || [ $func == 'e' ]; then
+
+            esPosibleDescomprimir
+
+            if [ $? -eq 1 ]; then
+            exit
+            fi
+
+            LOG=`7za $func -y -p$pass "$FILE"` || \
+            zenity --info --title="$TITLE" --text="$LOG"
+       fi
+       fi
+    ) | zenity --progress --title="$TITLE" --text="En progreso..." --pulsate --width=250
+}
+
+
+function Encriptar ()
+{
+    if [[ -e $NAME_ZIP ]]; then
+
+        ACTION=`zenity --list \
+            --title="$TITLE" \
+            --text="El archivo \"${NAME_ZIP##*/}\" ya existe.\n¿Que desea hacer?" \
+            --column="Acción" \
+            --print-column=1 \
+            Actualizar Sobrescribir`
+
+        if [[ -z $ACTION ]]; then
+        exit
+        fi
+
+        if [[ $ACTION == "Actualizar" ]]; then
+        func=u # Actualizar.
+        fi
+    fi
+
+    if [[ $func == "a" ]]; then
+        rm "$NAME_ZIP"
+    fi
+
+    7zip $func
+}
+
+###############################################################################
 TITLE='7zip encriptado'
 
-# Sin parámetros, termina. 
-# Util, en caso de utilizarse la terminal.
 if (( $# == 0 )); then
     zenity --error --title="$TITLE" --text="Ningún archivo o directorio seleccionado."
     exit
@@ -72,71 +198,20 @@ if (( $# > 1 )); then
  
 fi
 
+##############################################################################
 FILE="$1"
 NAME_ZIP=${FILE%/}.7z
 func=a # Por defecto, crear.
 
-# Si el archivo no existe, termina.
-# Util, en caso de utilizarse la terminal.
 if ! [[ -e $FILE ]]; then
     zenity --error --title="$TITLE" --text="El archivo/directorio \"$FILE\" no existe!"
     exit
 fi
 
-
-# Verifica si el archivo ya existe.
-# Presenta opciones al usuario.
-if [[ -e $NAME_ZIP ]]; then 
-   
-    ACTION=`zenity --list \
-            --title="$TITLE" \
-            --text="El archivo \"$NAME_ZIP\" ya existe.\n¿Que desea hacer?" \
-            --column="Acción" \
-            --print-column=1 \
-            Actualizar  \
-            Sobrescribir `
-
-    if [[ -z $ACTION ]]; then
-        exit
-    fi
-
-    if [[ $ACTION == "Actualizar" ]]; then
-        func=u # Actualizar.
-    fi
-fi
-
-# Obtener la clave.
-# Este es lugar indicado.
-TENC="Ingrese la clave para encriptar:"
-TDEC="Ingrese la clave para\ndesencriptar y actualizar:"
-if [[ $func == "u" ]]; then 
-    TEXT="$TDEC"
+if [ ${FILE: -3} == ".7z" ]; then
+    Desencriptar
 else
-    TEXT="$TENC"
+    Encriptar
 fi
 
-pass=`zenity --entry \
-    --text="$TEXT"    \
-    --title="$TITLE" \
-    --hide-text`
-
-# Si la clave es vacía, termina.
-if [[ -z $pass ]]; then
-    exit
-fi
-
-# Si se va ha crear un nuevo archivo y la clave es válida
-# es seguro eliminar.
-if [[ $func == "a" ]]; then
-    rm "$NAME_ZIP"
-fi
-
-(
-    MSG_ERROR="p7zip informa de un error.\n \
-    Es posible que Ud. quiso actualizar su archivo\n \
-    e ingreso una clave no válida."
-    7za $func -y -mhe=on -p$pass "$NAME_ZIP" "$FILE" || \
-        zenity --info --title="$TITLE" --text="$MSG_ERROR"
-
-) | zenity --progress --title="$TITLE" --text="En progreso..." --pulsate --width=250
-
+exit
