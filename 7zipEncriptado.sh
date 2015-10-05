@@ -101,12 +101,12 @@ function esPosibleDescomprimir ()
     local ES_DIR=`7za l -p$pass $FILE | awk '{print $3,$6}' |  grep "^D[+.]" | \
         awk '{print $1}' | head -n 1`
 
-    if ! [[ -z $ES_DIR ]]; then
+    if ! [[ -z "$ES_DIR" ]]; then
 
         local NAME=`7za l -p$pass $FILE | awk '{print $3,$6}' |  grep "^D[+.]" | \
-        awk '{print $2}' | head -n 1`
+            awk '{print $2}' | head -n 1`
 
-        if [[ -e $NAME ]]; then
+        if [[ -e "$NAME" ]]; then
 
             zenity --question --text="Ya existe el directorio $NAME\n¿Desea sobreescribirlo?"
             return $?
@@ -115,9 +115,9 @@ function esPosibleDescomprimir ()
     else
 
         local NAME=`7za l -p$pass $FILE | awk '{print $3,$6}' |  grep "[+.]A" | \
-        awk '{print $2}' | head -n 1`
+            awk '{print $2}' | head -n 1`
 
-        if [[ -e $NAME ]]; then
+        if [[ -e "$NAME" ]]; then
 
             zenity --question --text="Ya existe el archivo $NAME\n¿Desea sobreescribirlo?"
             return $?
@@ -141,18 +141,18 @@ function 7zip ()
         if [ $func == 'u' ] || [ $func == 'a' ];  then
 
             LOG=`7za $func -y -mhe=on -p$pass "$NAME_ZIP" "$FILE"` || \
-            zenity --info --title="$TITLE" --text="$LOG"
+                zenity --info --title="$TITLE" --text="$LOG"
 
         else if [ $func == 'x' ] || [ $func == 'e' ]; then
 
             esPosibleDescomprimir
 
             if [ $? -eq 1 ]; then
-            exit
+                exit
             fi
 
             LOG=`7za $func -y -p$pass "$FILE"` || \
-            zenity --info --title="$TITLE" --text="$LOG"
+                zenity --info --title="$TITLE" --text="$LOG"
        fi
        fi
     ) | zenity --progress --title="$TITLE" --text="En progreso..." --pulsate --width=250
@@ -171,11 +171,11 @@ function Encriptar ()
             Actualizar Sobrescribir`
 
         if [[ -z $ACTION ]]; then
-        exit
+            exit
         fi
 
         if [[ $ACTION == "Actualizar" ]]; then
-        func=u # Actualizar.
+            func=u # Actualizar.
         fi
     fi
 
