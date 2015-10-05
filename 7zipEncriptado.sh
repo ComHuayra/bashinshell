@@ -98,11 +98,13 @@ function 7zipInformacion ()
 
 function esPosibleDescomprimir ()
 {
-    local ES_DIR=`7za l -p$pass $FILE | awk '{print $3,$6}' |  grep ^D[+.]  | awk '{print $1}'`
+    local ES_DIR=`7za l -p$pass $FILE | awk '{print $3,$6}' |  grep "^D[+.]" | \
+        awk '{print $1}' | head -n 1`
 
     if ! [[ -z $ES_DIR ]]; then
 
-        local NAME=`7za l -p$pass $FILE | awk '{print $3,$6}' |  grep ^D[+.]  | awk '{print $2}'`
+        local NAME=`7za l -p$pass $FILE | awk '{print $3,$6}' |  grep "^D[+.]" | \
+        awk '{print $2}' | head -n 1`
 
         if [[ -e $NAME ]]; then
 
@@ -112,7 +114,8 @@ function esPosibleDescomprimir ()
         fi
     else
 
-        local NAME=`7za l -p$pass $FILE | awk '{print $3,$6}' |  grep "[+.]A"  | awk '{print $2}'`
+        local NAME=`7za l -p$pass $FILE | awk '{print $3,$6}' |  grep "[+.]A" | \
+        awk '{print $2}' | head -n 1`
 
         if [[ -e $NAME ]]; then
 
