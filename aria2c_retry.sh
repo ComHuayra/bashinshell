@@ -32,10 +32,10 @@ declare -i count=1
 while [[ 1 ]]; do
     aria2c -i "$url_file" --lowest-speed-limit "$low_speed"
     if [[ $? -eq 0 ]]; then 
-        printf "\n\a[*] The download is complete on $count retries.\n"
+        printf "\n\a[*] The download is complete on #$count retries.\n"
         exit 0
     fi
-    printf "\n\a[#$count] Waiting $sleep_sec seconds.\n"
+    printf "\n\a[#$count] Waiting $sleep_sec seconds...\n"
     count=count+1
     sleep $sleep_sec
  done
