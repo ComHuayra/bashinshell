@@ -138,16 +138,16 @@ function 7zip ()
     ObtenerClave
 
     (
-        if [ $func == 'u' ] || [ $func == 'a' ];  then
+        if [[ $func == 'u' ]] || [[ $func == 'a' ]];  then
 
             LOG=`7za $func -y -mhe=on -p$pass "$NAME_ZIP" "$FILE"` || \
                 zenity --info --title="$TITLE" --text="$LOG"
 
-        else if [ $func == 'x' ] || [ $func == 'e' ]; then
+        else if [[ $func == 'x' ]] || [[ $func == 'e' ]]; then
 
             esPosibleDescomprimir
 
-            if [ $? -eq 1 ]; then
+            if [[ $? -eq 1 ]]; then
                 exit
             fi
 
@@ -211,7 +211,7 @@ if ! [[ -e $FILE ]]; then
     exit
 fi
 
-if [ ${FILE: -3} == ".7z" ]; then
+if [[ ${FILE: -3} == ".7z" ]]; then
     Desencriptar
 else
     Encriptar
