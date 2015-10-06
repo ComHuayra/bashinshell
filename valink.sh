@@ -6,7 +6,7 @@ if [[ $# -eq 0 ]]; then
 fi
 
 # Ctrl + C
-trap "echo "Cancelado."exit 1" TERM INT
+trap "echo Cancelado.; exit 1" TERM INT
 
 echo "Buscando..."
 
