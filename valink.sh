@@ -10,6 +10,8 @@ trap "echo Cancelado.; exit 1" TERM INT
 
 echo "Buscando..."
 
-find  "$1" -type l -exec bash -c '[ -e "'{}'" ] || echo "'{}' : No es un link valido."' \;
+find  "$1" -type l -exec bash -c '[ -e "'{}'" ] || echo "'{}' : No es un enlace válido"' \;
+
+echo "...Finalizado."
 
 exit 0
