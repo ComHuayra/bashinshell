@@ -43,7 +43,6 @@ while [[ 1 ]]; do
         help
     fi
     fi
-    echo "RETUN: $?"
     printf "\n\a[#$count] Waiting $sleep_sec seconds...\n"
     count=count+1
     sleep $sleep_sec
