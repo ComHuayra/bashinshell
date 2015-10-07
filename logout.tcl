@@ -29,7 +29,7 @@ set SHELL "/bin/bash"
 
 set accion Apagar	;# Accion por defecto
 
-set sesion OpenBox  ;# Sesión por defecto
+set sesion JWM		;# Sesión por defecto
 
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
