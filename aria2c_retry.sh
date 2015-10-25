@@ -39,9 +39,6 @@ while [[ 1 ]]; do
     if [[ $? -eq 0 ]]; then 
         printf "\n\a[*] The download is complete on #$count retries.\n"
         exit 0
-    else if [[ $? -eq 1 ]]; then
-        help
-    fi
     fi
     printf "\n\a[#$count] Waiting $sleep_sec seconds...\n"
     count=count+1
