@@ -6,11 +6,11 @@ if [[ $# -eq 0 ]]; then
 fi
 
 
-zenity --question --text="¿Esta seguro de continuar?" --title="Celuloide"
-
-if [[ $? -ne 0 ]]; then 
-	exit $?
-fi
+#zenity --question --text="¿Esta seguro de continuar?" --title="Celuloide"
+#
+#if [[ $? -ne 0 ]]; then 
+#	exit $?
+#fi
 
 feh --auto-zoom --fullscreen $*
 

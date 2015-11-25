@@ -3,7 +3,9 @@
 NEXT="-n" 
 PREV="-p" 
 TOGGLE="-t"
-
+SEEK_PLUS="++"
+SEEK_MINUS="--"
+SEEK_VAL=15
 
 function mpd_control {
 
@@ -18,6 +20,7 @@ function mpd_control {
         $NEXT) mpc -p $PORT next;;
         $PREV) mpc -p $PORT prev;;
         $TOGGLE) mpc -p $PORT toggle;
+		# TODO: seek
     esac
 }
 
@@ -27,6 +30,8 @@ function mocp_control {
         $NEXT) mocp -f;;
         $PREV) mocp -r;;
         $TOGGLE) mocp -G;;
+        $SEEK_PLUS) mocp -k $SEEK_VAL;;
+        $SEEK_MINUS) mocp -k -$SEEK_VAL;;
     esac
 }
 
